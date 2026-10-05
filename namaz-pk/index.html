@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Namaz Times Pakistan – Prayer Times for Every City</title>
+<meta name="description" content="Accurate daily prayer times (Fajr, Dhuhr, Asr, Maghrib, Isha) for every major city in Pakistan.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕌</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{night:'#07181a',teal:{deep:'#0e3b3a'},brass:'#d4a84f',ivory:'#f4efe2',mist:'#8fb5ae'},fontFamily:{display:['Amiri','serif'],body:['Outfit','sans-serif']}}}}
+</script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="font-body text-ivory bg-night min-h-screen">
+
+<header class="relative z-10 max-w-6xl mx-auto px-5 pt-6 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#d4a84f" stroke-width="1.5"><path d="M12 2a7 7 0 1 0 8 9 6 6 0 1 1-8-9z"/><path d="M4 22v-6a3 3 0 0 1 6 0v6M2 22h20"/></svg>
+    <span class="font-display text-2xl">Namaz Times <span class="text-brass">Pakistan</span></span>
+  </div>
+  <div id="hijri" class="hidden sm:block text-mist text-sm"></div>
+</header>
+
+<main class="relative z-10 max-w-6xl mx-auto px-5 pb-16">
+
+  <!-- Hero -->
+  <section class="grid lg:grid-cols-5 gap-8 items-center pt-10 pb-12">
+    <div class="lg:col-span-3 text-center lg:text-left">
+      <p class="text-mist" id="dateLine">&nbsp;</p>
+      <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl leading-[1.05] mt-3">
+        Prayer times for <span id="cityTitle" class="text-brass">Lahore</span>
+      </h1>
+      <p class="mt-5 text-mist max-w-lg mx-auto lg:mx-0">Choose your city to see today's Fajr, Dhuhr, Asr, Maghrib and Isha times, with a live countdown to the next prayer.</p>
+
+      <div class="mt-8 grid sm:grid-cols-3 gap-3 max-w-2xl mx-auto lg:mx-0">
+        <div class="sm:col-span-3 relative">
+          <input id="search" type="search" placeholder="Search a city, e.g. Multan" autocomplete="off"
+            class="glass w-full rounded-xl px-4 py-3 outline-none placeholder:text-mist/60 focus:ring-2 focus:ring-brass">
+          <ul id="results" class="hidden absolute z-30 mt-2 w-full max-h-64 overflow-auto rounded-xl glass-solid divide-y divide-white/5"></ul>
+        </div>
+        <select id="city" aria-label="City" class="glass rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brass"></select>
+        <select id="method" aria-label="Calculation method" class="glass rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brass">
+          <option value="1">Karachi (Univ. of Islamic Sciences)</option>
+          <option value="3">Muslim World League</option>
+          <option value="2">ISNA</option>
+          <option value="5">Egyptian Authority</option>
+        </select>
+        <select id="school" aria-label="Asr calculation" class="glass rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brass">
+          <option value="1">Asr – Hanafi</option>
+          <option value="0">Asr – Shafi'i</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Countdown ring -->
+    <div class="lg:col-span-2 flex justify-center">
+      <div class="relative w-72 h-72 sm:w-80 sm:h-80">
+        <svg viewBox="0 0 200 200" class="w-full h-full -rotate-90">
+          <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="6"/>
+          <circle id="ring" cx="100" cy="100" r="90" fill="none" stroke="#d4a84f" stroke-width="6" stroke-linecap="round" stroke-dasharray="565.5" stroke-dashoffset="565.5"/>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <span class="text-mist text-sm">Next prayer</span>
+          <span id="nextName" class="font-display text-4xl mt-1">–</span>
+          <span id="countdown" class="tabular-nums text-4xl sm:text-5xl font-light mt-2 tracking-tight">--:--:--</span>
+          <span id="nextTime" class="text-brass mt-2">&nbsp;</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="error" class="hidden glass rounded-xl p-4 mb-6 text-center text-red-200"></div>
+
+  <!-- Prayer cards -->
+  <section id="cards" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" aria-live="polite"></section>
+
+  <!-- All cities -->
+  <section class="mt-16">
+    <h2 class="font-display text-3xl mb-1">All cities in Pakistan</h2>
+    <p class="text-mist mb-6">Tap a city to switch the times above.</p>
+    <div id="cityGrid" class="flex flex-wrap gap-2"></div>
+  </section>
+</main>
+
+<footer class="relative z-10 text-center text-mist text-sm pb-10 px-5">
+  Times provided by the <a class="underline hover:text-brass" href="https://aladhan.com/prayer-times-api" target="_blank" rel="noopener">AlAdhan Prayer Times API</a>. Please confirm with your local masjid.
+</footer>
+
+<script src="js/cities.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
